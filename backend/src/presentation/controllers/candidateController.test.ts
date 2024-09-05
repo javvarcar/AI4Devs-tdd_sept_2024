@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { addCandidateController } from './candidateController';
+import { addCandidateController, getCandidateByIdController } from './candidateController';
 import * as candidateService from '../../application/services/candidateService';
 
 jest.mock('../../application/services/candidateService', () => ({
@@ -94,4 +94,67 @@ describe('addCandidateController', () => {
     });
 });
 
+describe('getCandidateByIdController', () => {
+    beforeEach(() => {
+        jest.clearAllMocks();
+    });
 
+    it('should return candidate information for a valid ID', async () => {
+        const candidateId = 1;
+        const candidateData = { id: candidateId, firstName: 'John', lastName: 'Doe', email: 'john.doe@example.com', phone: '1234567890', address: '123 Main St' };
+        (candidateService.getCandidateById as jest.Mock).mockResolvedValue(candidateData);
+
+        const req = mockRequest({ id: candidateId });
+        const res = mockResponse();
+
+        await getCandidateByIdController(req as Request, res as Response);
+
+        expect(candidateService.getCandidateById).toHaveBeenCalledWith(candidateId);
+        expect(res.status).toHaveBeenCalledWith(200);
+        expect(res.json).toHaveBeenCalledWith(candidateData);
+    });
+
+    it('should return 400 for an invalid ID', async () => {
+        const req = mockRequest({ id: 'invalid' });
+        const res = mockResponse();
+
+        await getCandidateByIdController(req as Request, res as Response);
+
+        expect(res.status).toHaveBeenCalledWith(400);
+        expect(res.json).toHaveBeenCalledWith({
+            message: 'Invalid candidate ID',
+        });
+    });
+
+    it('should return 404 if candidate is not found', async () => {
+        const candidateId = 1;
+        (candidateService.getCandidateById as jest.Mock).mockResolvedValue(null);
+
+        const req = mockRequest({ id: candidateId });
+        const res = mockResponse();
+
+        await getCandidateByIdController(req as Request, res as Response);
+
+        expect(candidateService.getCandidateById).toHaveBeenCalledWith(candidateId);
+        expect(res.status).toHaveBeenCalledWith(404);
+        expect(res.json).toHaveBeenCalledWith({
+            message: 'Candidate not found',
+        });
+    });
+
+    it('should return 500 for database connection errors', async () => {
+        const candidateId = 1;
+        (candidateService.getCandidateById as jest.Mock).mockRejectedValue(new Error('Database connection error'));
+
+        const req = mockRequest({ id: candidateId });
+        const res = mockResponse();
+
+        await getCandidateByIdController(req as Request, res as Response);
+
+        expect(candidateService.getCandidateById).toHaveBeenCalledWith(candidateId);
+        expect(res.status).toHaveBeenCalledWith(500);
+        expect(res.json).toHaveBeenCalledWith({
+            message: 'Internal server error',
+        });
+    });
+});

@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { addCandidate } from '../../application/services/candidateService';
+import { addCandidate, getCandidateById } from '../../application/services/candidateService';
 
 export const addCandidateController = async (req: Request, res: Response) => {
     try {
@@ -15,4 +15,21 @@ export const addCandidateController = async (req: Request, res: Response) => {
     }
 };
 
-export { addCandidate };
+export const getCandidateByIdController = async (req: Request, res: Response) => {
+    const { id } = req.params;
+    if (isNaN(Number(id))) {
+        return res.status(400).json({ message: 'Invalid candidate ID' });
+    }
+
+    try {
+        const candidate = await getCandidateById(Number(id));
+        if (!candidate) {
+            return res.status(404).json({ message: 'Candidate not found' });
+        }
+        res.status(200).json(candidate);
+    } catch (error: unknown) {
+        res.status(500).json({ message: 'Internal server error' });
+    }
+};
+
+export { addCandidate, getCandidateById };

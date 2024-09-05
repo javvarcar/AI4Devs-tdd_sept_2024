@@ -1,4 +1,4 @@
-import { addCandidate } from './candidateService';
+import { addCandidate, getCandidateById } from './candidateService';
 import { validateCandidateData } from '../validator';
 import { Candidate } from '../../domain/models/Candidate';
 import { Education } from '../../domain/models/Education';
@@ -165,6 +165,47 @@ describe('CandidateService', () => {
             }));
 
             await expect(addCandidate(candidateData)).rejects.toThrow('The email already exists in the database');
+        });
+    });
+
+    describe('getCandidateById', () => {
+        it('should return candidate information for a valid ID', async () => {
+            const candidateId = 1;
+            const candidateData = {
+                id: candidateId,
+                firstName: 'John',
+                lastName: 'Doe',
+                email: 'john.doe@example.com',
+                phone: '1234567890',
+                address: '123 Main St',
+                education: [],
+                workExperience: [],
+                resumes: []
+            };
+
+            MockedCandidate.findOne = jest.fn().mockResolvedValue(candidateData);
+
+            const result = await getCandidateById(candidateId);
+            expect(MockedCandidate.findOne).toHaveBeenCalledWith(candidateId);
+            expect(result).toEqual(candidateData);
+        });
+
+        it('should return null if candidate is not found', async () => {
+            const candidateId = 1;
+
+            MockedCandidate.findOne = jest.fn().mockResolvedValue(null);
+
+            const result = await getCandidateById(candidateId);
+            expect(MockedCandidate.findOne).toHaveBeenCalledWith(candidateId);
+            expect(result).toBeNull();
+        });
+
+        it('should handle database connection errors', async () => {
+            const candidateId = 1;
+
+            MockedCandidate.findOne = jest.fn().mockRejectedValue(new Error('Database connection error'));
+
+            await expect(getCandidateById(candidateId)).rejects.toThrow('Database connection error');
         });
     });
 });

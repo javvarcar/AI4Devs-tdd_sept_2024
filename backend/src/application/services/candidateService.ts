@@ -53,3 +53,12 @@ export const addCandidate = async (candidateData: any) => {
         }
     }
 };
+
+export const getCandidateById = async (id: number): Promise<Candidate | null> => {
+    try {
+        const candidate = await Candidate.findOne(id);
+        return candidate;
+    } catch (error: any) {
+        throw new Error('Database connection error');
+    }
+};
