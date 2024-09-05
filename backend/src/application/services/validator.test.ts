@@ -12,62 +12,87 @@ import {
 
 describe('Validator Tests', () => {
     describe('validateName', () => {
-        it('should validate a correct name', () => {
-            expect(() => validateName('John Doe')).not.toThrow();
+        const validNames = ['John Doe', 'Jane Smith'];
+        const invalidNames = ['', 'J', 'A'.repeat(101), 'John123'];
+
+        validNames.forEach(name => {
+            it(`should validate a correct name: ${name}`, () => {
+                expect(() => validateName(name)).not.toThrow();
+            });
         });
 
-        it('should throw an error for an invalid name', () => {
-            expect(() => validateName('')).toThrow('Invalid name');
-            expect(() => validateName('J')).toThrow('Invalid name');
-            expect(() => validateName('A'.repeat(101))).toThrow('Invalid name');
-            expect(() => validateName('John123')).toThrow('Invalid name');
+        invalidNames.forEach(name => {
+            it(`should throw an error for an invalid name: ${name}`, () => {
+                expect(() => validateName(name)).toThrow('Invalid name');
+            });
         });
     });
 
     describe('validateEmail', () => {
-        it('should validate a correct email', () => {
-            expect(() => validateEmail('john.doe@example.com')).not.toThrow();
+        const validEmails = ['john.doe@example.com', 'jane.smith@domain.com'];
+        const invalidEmails = ['', 'john.doe', 'john.doe@com'];
+
+        validEmails.forEach(email => {
+            it(`should validate a correct email: ${email}`, () => {
+                expect(() => validateEmail(email)).not.toThrow();
+            });
         });
 
-        it('should throw an error for an invalid email', () => {
-            expect(() => validateEmail('')).toThrow('Invalid email');
-            expect(() => validateEmail('john.doe')).toThrow('Invalid email');
-            expect(() => validateEmail('john.doe@com')).toThrow('Invalid email');
+        invalidEmails.forEach(email => {
+            it(`should throw an error for an invalid email: ${email}`, () => {
+                expect(() => validateEmail(email)).toThrow('Invalid email');
+            });
         });
     });
 
     describe('validatePhone', () => {
-        it('should validate a correct phone number', () => {
-            expect(() => validatePhone('612345678')).not.toThrow();
+        const validPhones = ['612345678'];
+        const invalidPhones = ['512345678', '61234567', '6123456789'];
+
+        validPhones.forEach(phone => {
+            it(`should validate a correct phone number: ${phone}`, () => {
+                expect(() => validatePhone(phone)).not.toThrow();
+            });
         });
 
-        it('should throw an error for an invalid phone number', () => {
-            expect(() => validatePhone('')).not.toThrow(); // Optional field
-            expect(() => validatePhone('512345678')).toThrow('Invalid phone');
-            expect(() => validatePhone('61234567')).toThrow('Invalid phone');
-            expect(() => validatePhone('6123456789')).toThrow('Invalid phone');
+        invalidPhones.forEach(phone => {
+            it(`should throw an error for an invalid phone number: ${phone}`, () => {
+                expect(() => validatePhone(phone)).toThrow('Invalid phone');
+            });
         });
     });
 
     describe('validateDate', () => {
-        it('should validate a correct date', () => {
-            expect(() => validateDate('2023-01-01')).not.toThrow();
+        const validDates = ['2023-01-01'];
+        const invalidDates = ['', '01-01-2023', '2023/01/01'];
+
+        validDates.forEach(date => {
+            it(`should validate a correct date: ${date}`, () => {
+                expect(() => validateDate(date)).not.toThrow();
+            });
         });
 
-        it('should throw an error for an invalid date', () => {
-            expect(() => validateDate('')).toThrow('Invalid date');
-            expect(() => validateDate('01-01-2023')).toThrow('Invalid date');
-            expect(() => validateDate('2023/01/01')).toThrow('Invalid date');
+        invalidDates.forEach(date => {
+            it(`should throw an error for an invalid date: ${date}`, () => {
+                expect(() => validateDate(date)).toThrow('Invalid date');
+            });
         });
     });
 
     describe('validateAddress', () => {
-        it('should validate a correct address', () => {
-            expect(() => validateAddress('123 Main St')).not.toThrow();
+        const validAddresses = ['123 Main St'];
+        const invalidAddresses = ['A'.repeat(101)];
+
+        validAddresses.forEach(address => {
+            it(`should validate a correct address: ${address}`, () => {
+                expect(() => validateAddress(address)).not.toThrow();
+            });
         });
 
-        it('should throw an error for an invalid address', () => {
-            expect(() => validateAddress('A'.repeat(101))).toThrow('Invalid address');
+        invalidAddresses.forEach(address => {
+            it(`should throw an error for an invalid address: ${address}`, () => {
+                expect(() => validateAddress(address)).toThrow('Invalid address');
+            });
         });
     });
 
