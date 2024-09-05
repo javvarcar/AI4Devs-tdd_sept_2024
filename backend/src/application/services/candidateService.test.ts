@@ -18,7 +18,7 @@ const MockedResume = jest.mocked(Resume);
 
 describe('CandidateService', () => {
     afterEach(() => {
-        jest.clearAllMocks();
+        jest.resetAllMocks();
     });
 
     describe('addCandidate', () => {
@@ -117,6 +117,54 @@ describe('CandidateService', () => {
             await expect(addCandidate(candidateData)).rejects.toThrow('Invalid email');
         });
 
+        it('should handle database connection errors', async () => {
+            const candidateData = {
+                firstName: 'John',
+                lastName: 'Doe',
+                email: 'john.doe@example.com',
+                phone: '1234567890',
+                address: '123 Main St',
+                educations: [],
+                workExperiences: [],
+                cv: {}
+            };
 
+            // Mock save method to throw a database connection error
+            const mockSave = jest.fn().mockRejectedValue(new Error('Database connection error'));
+            MockedCandidate.mockImplementation((data) => ({
+                ...data,
+                save: mockSave,
+                education: [],
+                workExperience: [],
+                resumes: []
+            }));
+
+            await expect(addCandidate(candidateData)).rejects.toThrow('Database connection error');
+        });
+
+        it('should handle unique constraint errors', async () => {
+            const candidateData = {
+                firstName: 'John',
+                lastName: 'Doe',
+                email: 'john.doe@example.com',
+                phone: '1234567890',
+                address: '123 Main St',
+                educations: [],
+                workExperiences: [],
+                cv: {}
+            };
+
+            // Mock save method to throw a unique constraint error
+            const mockSave = jest.fn().mockRejectedValue({ code: 'P2002' });
+            MockedCandidate.mockImplementation((data) => ({
+                ...data,
+                save: mockSave,
+                education: [],
+                workExperience: [],
+                resumes: []
+            }));
+
+            await expect(addCandidate(candidateData)).rejects.toThrow('The email already exists in the database');
+        });
     });
 });
